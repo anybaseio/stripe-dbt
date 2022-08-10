@@ -6,7 +6,6 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 # Default for running on Splitgraph Cloud
 profile: splitgraph
-modules-path: "../dbt_modules"
 
 models:
   stripe_source:
@@ -14,6 +13,7 @@ models:
   ab2ft_stripe:
     materialized: ephemeral
 vars:
+  modules-path: "../dbt_modules"
   # Standard data flow:
   # Fivetran Stripe schema -> fivetran/stripe_source -> fivetran/stripe
   #
