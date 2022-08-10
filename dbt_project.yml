@@ -6,6 +6,7 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 # Default for running on Splitgraph Cloud
 profile: splitgraph
+modules-path: "../dbt_modules"
 
 models:
   stripe_source:
