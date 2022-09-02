@@ -14,7 +14,7 @@ models:
     materialized: ephemeral
 vars:
   stripe_schema: "stripe"
-  # schema: "stripe"
+  schema: "stripe"
   modules-path: "../dbt_packages"
   # Standard data flow:
   # Fivetran Stripe schema -> fivetran/stripe_source -> fivetran/stripe
