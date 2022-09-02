@@ -13,7 +13,7 @@ models:
   ab2ft_stripe:
     materialized: ephemeral
 vars:
-  schema: "stripe"
+  # schema: "stripe"
   modules-path: "../dbt_packages"
   # Standard data flow:
   # Fivetran Stripe schema -> fivetran/stripe_source -> fivetran/stripe
