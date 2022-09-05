@@ -42,6 +42,7 @@ vars:
     credit_note_line_item: "{{ ref('ab2ft_stripe_credit_note_line_item') }}"
 
   ab2ft_stripe:
+    stripe_schema: public
     airbyte_raw_subscriptions: "{{ source('airbyte_raw_stripe', '_airbyte_raw_subscriptions') }}"
     airbyte_raw_balance_transactions: "{{ source('airbyte_raw_stripe', '_airbyte_raw_balance_transactions') }}"
     airbyte_raw_invoices: "{{ source('airbyte_raw_stripe', '_airbyte_raw_invoices') }}"
