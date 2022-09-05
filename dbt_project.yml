@@ -1,42 +1,55 @@
-name: "airbyte_stripe"
-version: "0.1.0"
-require-dbt-version: [">=1.0.0"]
 config-version: 2
-profile: "default"
-model-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
 
-target-path: "target"
-clean-targets:
-  - "target"
-  - "dbt_packages"
+name: ab2ft_stripe
+version: 0.1.0
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+# Default for running on Splitgraph Cloud
+profile: splitgraph
 
 models:
-  airbyte_stripe:
-    materialized: table
-    tmp:
-      materialized: view
-
+  stripe_source:
+    materialized: view
+  ab2ft_stripe:
+    materialized: ephemeral
 vars:
   modules-path: "../dbt_packages"
-  airbyte_stripe:
-    customers: "{{ source('airbyte_stripe','customers') }}"
-    customers_address: "{{ source('airbyte_stripe','customers_address') }}"
-    balance_transactions: "{{ source('airbyte_stripe','balance_transactions') }}"
-    charges_card: "{{ source('airbyte_stripe','charges_card') }}"
-    charges: "{{ source('airbyte_stripe','charges') }}"
-    payment_intents: "{{ source('airbyte_stripe','payment_intents') }}"
-    payouts: "{{ source('airbyte_stripe','payouts') }}"
-    refunds: "{{ source('airbyte_stripe','refunds') }}"
-    invoice_line_items: "{{ source('airbyte_stripe','invoice_line_items') }}"
-    invoice_line_items_period: "{{ source('airbyte_stripe','invoice_line_items_period') }}"
-    invoice_line_items_plan: "{{ source('airbyte_stripe','invoice_line_items_plan') }}"
-    invoices: "{{ source('airbyte_stripe','invoices') }}"
-    subscriptions: "{{ source('airbyte_stripe','subscriptions') }}"
-    plans: "{{ source('airbyte_stripe','plans') }}"
+  # Standard data flow:
+  # Fivetran Stripe schema -> fivetran/stripe_source -> fivetran/stripe
+  #
+  # Patch it to do:
+  # Airbyte Stripe schema -> splitgraph/ab2ft_stripe -> fivetran/stripe_source -> fivetran/stripe
 
-  "dbt_date:time_zone": "UTC"
+  # The payment_method stream doesn't seem to be replicated by Airbyte, so set this to False.
+  using_payment_method: False
+
+  stripe_source:
+    balance_transaction: "{{ ref('ab2ft_stripe_balance_transaction') }}"
+    card: "{{ ref('ab2ft_stripe_card') }}"
+    charge: "{{ ref('ab2ft_stripe_charge') }}"
+    customer: "{{ ref('ab2ft_stripe_customer') }}"
+    fee: "{{ ref('ab2ft_stripe_fee') }}"
+    payment_intent: "{{ ref('ab2ft_stripe_payment_intent') }}"
+    payment_method_card: "{{ ref('ab2ft_stripe_payment_method_card') }}"
+    payment_method: "{{ ref('ab2ft_stripe_payment_method') }}"
+    payout: "{{ ref('ab2ft_stripe_payout') }}"
+    refund: "{{ ref('ab2ft_stripe_refund') }}"
+    invoice_line_item: "{{ ref('ab2ft_stripe_invoice_line_item') }}"
+    invoice: "{{ ref('ab2ft_stripe_invoice') }}"
+    subscription: "{{ ref('ab2ft_stripe_subscription') }}"
+    plan: "{{ ref('ab2ft_stripe_plan') }}"
+    credit_note: "{{ ref('ab2ft_stripe_credit_note') }}"
+    credit_note_line_item: "{{ ref('ab2ft_stripe_credit_note_line_item') }}"
+
+  ab2ft_stripe:
+    airbyte_raw_subscriptions: "{{ source('airbyte_raw_stripe', '_airbyte_raw_subscriptions') }}"
+    airbyte_raw_balance_transactions: "{{ source('airbyte_raw_stripe', '_airbyte_raw_balance_transactions') }}"
+    airbyte_raw_invoices: "{{ source('airbyte_raw_stripe', '_airbyte_raw_invoices') }}"
+    airbyte_raw_charges: "{{ source('airbyte_raw_stripe', '_airbyte_raw_charges') }}"
+    airbyte_raw_payouts: "{{ source('airbyte_raw_stripe', '_airbyte_raw_payouts') }}"
+    airbyte_raw_customer_balance_transactions: "{{ source('airbyte_raw_stripe','_airbyte_raw_customer_balance_transactions') }}"
+    airbyte_raw_customers: "{{ source('airbyte_raw_stripe', '_airbyte_raw_customers') }}"
+    airbyte_raw_refunds: "{{ source('airbyte_raw_stripe', '_airbyte_raw_refunds') }}"
+    airbyte_raw_payment_intents: "{{ source('airbyte_raw_stripe', '_airbyte_raw_payment_intents') }}"
+    airbyte_raw_invoice_line_items: "{{ source('airbyte_raw_stripe', '_airbyte_raw_invoice_line_items') }}"
+    airbyte_raw_plans: "{{ source('airbyte_raw_stripe', '_airbyte_raw_plans') }}"
